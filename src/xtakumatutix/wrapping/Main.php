@@ -28,9 +28,16 @@ Class Main extends PluginBase implements Listener {
                 $damage = $handitem->getDamage();
                 $count = $handitem->getCount();
 
+                $sender->getInventory()->removeItem(Item::get($id,$damage,$count));
+                $sender->getInventory()->removeItem(Item::get(339,0,1));
+
+                $name = $sender->getName();
                 $item = Item::get(378, 0);
+                $item->setLore(["中身はなにかな...?"]);
+                $item->setCustomName("{$name}様より");
                 $tag = $item->getNamedTag() ?? new CompoundTag('', []);
-                $tag->setTag(new StringTag("wrapping","{$id}"), true);
+                $tag->setTag(new StringTag("wrapping","1"), true);
+                $tag->setTag(new StringTag("wrapping1","{$id}"), true);
                 $tag->setTag(new StringTag("wrapping2","{$damage}"), true);
                 $tag->setTag(new StringTag("wrapping3","{$count}"), true);
                 $item->setNamedTag($tag);
@@ -39,11 +46,11 @@ Class Main extends PluginBase implements Listener {
 
                 return false;
             }else{
-                $sender->sendMessage("3");
+                $sender->sendMessage("紙がありません");
                 return true;
             }
         }else{
-            $sender->sendMessage("4");
+            $sender->sendMessage("ゲーム内で使用してください");
             return false;
         }
     }
