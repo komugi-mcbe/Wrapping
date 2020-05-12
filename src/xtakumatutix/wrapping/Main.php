@@ -7,6 +7,7 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\item\Item;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\event\Listener;
 
 Class Main extends PluginBase implements Listener {
@@ -21,7 +22,21 @@ Class Main extends PluginBase implements Listener {
     {
         if ($sender instanceof Player) {
             if($sender->getInventory()->all(Item::get(Item::PAPER))) {
-                $sender->sendMessage("2");
+                $handitem = $sender->getInventory()->getItemInHand();
+                $id = $handitem->getID();
+                $itemname = $handitem->getName();
+                $damage = $handitem->getDamage();
+                $count = $handitem->getCount();
+
+                $item = Item::get(378, 0);
+                $tag = $item->getNamedTag() ?? new CompoundTag('', []);
+                $tag->setTag(new StringTag("wrapping","{$id}"), true);
+                $tag->setTag(new StringTag("wrapping2","{$damage}"), true);
+                $tag->setTag(new StringTag("wrapping3","{$count}"), true);
+                $item->setNamedTag($tag);
+                $sender->getInventory()->addItem($item);
+                $sender->sendMessage("ラッピングしました！！");
+
                 return false;
             }else{
                 $sender->sendMessage("3");
