@@ -2,13 +2,13 @@
 
 namespace xtakumatutix\wrapping;
 
-use pocketmine\nbt\tag\IntTag;
 use pocketmine\plugin\PluginBase;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\StringTag;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\event\Listener;
 use pocketmine\event\Player\PlayerInteractEvent;
@@ -16,7 +16,8 @@ use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 
 Class Main extends PluginBase implements Listener {
 
-    public function onEnable() {
+    public function onEnable() 
+    {
         $this->getLogger()->notice("読み込み完了_ver.1.0.0");
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
@@ -57,18 +58,18 @@ Class Main extends PluginBase implements Listener {
         }
     }
 
-    public function tap(PlayerInteractEvent $event) {
+    public function tap(PlayerInteractEvent $event)
+    {
         $player = $event->getPlayer();
         $item = $player->getInventory()->getItemInHand();
         $itemid = $item->getID();
         if ($itemid===378) {
             $tag = $item->getNamedTag();
             if ($tag->offsetExists("wrapping")) {
-                $comtag=$tag->getCompoundTag("wrapping");
-                $id = $comtag->getInt('wrapping1');
-                $damage = $comtag->getInt('wrapping2');
-                $count = $comtag->getInt('wrapping3');
-                $name = $comtag->getString('wrapping4');
+                $id = $tag->getInt('wrapping1');
+                $damage = $tag->getInt('wrapping2');
+                $count = $tag->getInt('wrapping3');
+                $name = $tag->getString('wrapping4');
 
                 $player->getInventory()->removeItem($item);
                 $player->getInventory()->addItem(Item::get($id, $damage, $count));
