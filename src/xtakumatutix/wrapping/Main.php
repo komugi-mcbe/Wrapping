@@ -9,6 +9,8 @@ use pocketmine\Player;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\event\Listener;
+use pocketmine\event\Player\PlayerInteractEvent;
+use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 
 Class Main extends PluginBase implements Listener {
 
@@ -40,18 +42,50 @@ Class Main extends PluginBase implements Listener {
                 $tag->setTag(new StringTag("wrapping1","{$id}"), true);
                 $tag->setTag(new StringTag("wrapping2","{$damage}"), true);
                 $tag->setTag(new StringTag("wrapping3","{$count}"), true);
+                $tag->setTag(new StringTag("wrapping4","{$name}"), true);
                 $item->setNamedTag($tag);
                 $sender->getInventory()->addItem($item);
-                $sender->sendMessage("ラッピングしました！！");
+                $sender->sendMessage("§a >> ラッピングしました！！");
 
                 return false;
             }else{
-                $sender->sendMessage("紙がありません");
+                $sender->sendMessage("§c >> 紙がありません");
                 return true;
             }
         }else{
             $sender->sendMessage("ゲーム内で使用してください");
-            return false;
+            return true;
+        }
+    }
+
+    public function tap(PlayerInteractEvent $event)
+    {
+        $player = $event->getPlayer();
+        $item = $player->getInventory()->getItemInHand();
+        $itemid = $item->getID();
+        if(378 == $itemid){
+        $tag = $item->getNamedTag();
+        $data = $tag->getTag('wrapping')->getValue();
+            if(1 == $data){
+                $id = $tag->getTag('wrapping1')->getValue();
+                $damage = $tag->getTag('wrapping2')->getValue();
+                $count = $tag->getTag('wrapping3')->getValue();
+                $name = $tag->getTag('wrapping4')->getValue();
+                $player->getInventory()->removeItem(Item::get(378,0,1));
+                $player->getInventory()->addItem(Item::get($id,$damage,$count));
+                $player->sendMessage("§a >> {$name}様からのプレゼントです！");
+
+                $pk = new PlaySoundPacket();
+                $pk->soundName = 'random.levelup';
+                $pk->x = $player->x;
+                $pk->y = $player->y;
+                $pk->z = $player->z;
+                $pk->volume = 1;
+                $pk->pitch = 1;
+                $player->dataPacket($pk);
+            }
         }
     }
 }
+
+
