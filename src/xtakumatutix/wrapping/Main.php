@@ -8,6 +8,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\StringTag;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\event\Listener;
 use pocketmine\event\Player\PlayerInteractEvent;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
@@ -64,9 +65,8 @@ Class Main extends PluginBase implements Listener {
         $item = $player->getInventory()->getItemInHand();
         $itemid = $item->getID();
         if(378 == $itemid){
-        $tag = $item->getNamedTag();
-        $data = $tag->getTag('wrapping')->getValue();
-            if(1 == $data){
+            $tag = $item->getNamedTag();
+                if(isset($tag->getTag("wrapping"))){
                 $id = $tag->getTag('wrapping1')->getValue();
                 $damage = $tag->getTag('wrapping2')->getValue();
                 $count = $tag->getTag('wrapping3')->getValue();
@@ -87,5 +87,3 @@ Class Main extends PluginBase implements Listener {
         }
     }
 }
-
-
