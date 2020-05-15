@@ -7,6 +7,8 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\item\Item;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\CompoundTag;
@@ -22,31 +24,29 @@ Class Main extends PluginBase implements Listener {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
-    public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
+    public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool 
+    {
         if ($sender instanceof Player) {
             if ($sender->getInventory()->all(Item::get(Item::PAPER))) {
-                $handitem = $sender->getInventory()->getItemInHand();
-                $id = $handitem->getID();
-                $damage = $handitem->getDamage();
-                $count = $handitem->getCount();
+                $itemhand = $sender->getInventory()->getItemInHand();
 
-                $sender->getInventory()->removeItem(Item::get($id, $damage, $count));
-                $sender->getInventory()->removeItem(Item::get(339, 0, 1));
+                $sender->getInventory()->removeItem($itemhand);
+                $sender->getInventory()->removeItem(Item::get(Item::PAPER));
 
                 $name = $sender->getName();
+
                 $item = Item::get(378, 0);
+
                 $item->setLore(["中身はなにかな...?"]);
                 $item->setCustomName("{$name}様より");
+
                 $tag = $item->getNamedTag() ?? new CompoundTag('', []);
-                $tag->setTag(new IntTag("wrapping", 1), true);
-                $tag->setTag(new IntTag("wrapping1", $id), true);
-                $tag->setTag(new IntTag("wrapping2", $damage), true);
-                $tag->setTag(new IntTag("wrapping3", $count), true);
-                $tag->setTag(new StringTag("wrapping4", "{$name}"), true);
+                $tag->setTag(new StringTag("item", $itemhand), true);
+                $tag->setTag(new StringTag("name","{$name}"), true);
                 $item->setNamedTag($tag);
                 $sender->getInventory()->addItem($item);
-                $sender->sendMessage("§a >> ラッピングしました！！");
 
+                $sender->sendMessage("§a >> ラッピングしました！！");
                 return false;
             } else {
                 $sender->sendMessage("§c >> 紙がありません");
@@ -66,14 +66,12 @@ Class Main extends PluginBase implements Listener {
         $itemdamage = $item->getDamage();
         if ($itemid===378) {
             $tag = $item->getNamedTag();
-            if ($tag->offsetExists("wrapping")) {
-                $id = $tag->getInt('wrapping1');
-                $damage = $tag->getInt('wrapping2');
-                $count = $tag->getInt('wrapping3');
-                $name = $tag->getString('wrapping4');
+            if ($tag->offsetExists("item")) {
+                $nbtitem = $tag->getString('item');
+                $name = $tag->getString('name');
 
                 $player->getInventory()->removeItem(Item::get($itemid,$itemdamage,1,$tag));
-                $player->getInventory()->addItem(Item::get($id, $damage, $count));
+                $player->getInventory()->addItem($nbtitem);
                 $player->sendMessage("§a >> {$name}様からのプレゼントです！");
 
                 $pk = new PlaySoundPacket();
