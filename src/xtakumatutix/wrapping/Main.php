@@ -63,6 +63,7 @@ Class Main extends PluginBase implements Listener {
         $player = $event->getPlayer();
         $item = $player->getInventory()->getItemInHand();
         $itemid = $item->getID();
+        $itemdamage = $item->getDamage();
         if ($itemid===378) {
             $tag = $item->getNamedTag();
             if ($tag->offsetExists("wrapping")) {
@@ -71,7 +72,7 @@ Class Main extends PluginBase implements Listener {
                 $count = $tag->getInt('wrapping3');
                 $name = $tag->getString('wrapping4');
 
-                $player->getInventory()->removeItem($item);
+                $player->getInventory()->removeItem(Item::get($itemid,$itemdamage,1,$tag));
                 $player->getInventory()->addItem(Item::get($id, $damage, $count));
                 $player->sendMessage("§a >> {$name}様からのプレゼントです！");
 
