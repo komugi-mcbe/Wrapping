@@ -7,6 +7,7 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\nbt\tag\StringTag;
@@ -41,7 +42,7 @@ Class Main extends PluginBase implements Listener {
                 $item->setCustomName("{$name}様より");
 
                 $tag = $item->getNamedTag() ?? new CompoundTag('', []);
-                $tag->setTag(new StringTag("item", $itemhand), true);
+                $tag->setTag(new StringTag("item", json_encode($itemhand)), true);
                 $tag->setTag(new StringTag("name","{$name}"), true);
                 $item->setNamedTag($tag);
                 $sender->getInventory()->addItem($item);
@@ -67,7 +68,7 @@ Class Main extends PluginBase implements Listener {
         if ($itemid===378) {
             $tag = $item->getNamedTag();
             if ($tag->offsetExists("item")) {
-                $nbtitem = $tag->getString('item');
+                $nbtitem = Item::jsonDeserialize(json_decode($tag->getString('item'), true));
                 $name = $tag->getString('name');
 
                 $player->getInventory()->removeItem(Item::get($itemid,$itemdamage,1,$tag));
