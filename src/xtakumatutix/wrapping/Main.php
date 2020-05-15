@@ -30,7 +30,14 @@ Class Main extends PluginBase implements Listener {
         if ($sender instanceof Player) {
             if ($sender->getInventory()->all(Item::get(Item::PAPER))) {
                 $itemhand = $sender->getInventory()->getItemInHand();
-
+                if ($itemhand->getId()===0) {
+                    $sender->sendMessage("§c >> 空気のラッピングを行うことは出来ません。");
+                    return true;
+                }
+                if ($itemhand->getNamedTag()->offsetExists("name")) {
+                    $sender->sendMessage("§c >> 2重ラッピングを行うことは出来ません。");
+                    return true;
+                }
                 $sender->getInventory()->removeItem($itemhand);
                 $sender->getInventory()->removeItem(Item::get(Item::PAPER));
 
