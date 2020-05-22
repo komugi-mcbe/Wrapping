@@ -71,7 +71,15 @@ Class Main extends PluginBase implements Listener {
         if ($itemid===378) {
             $tag = $item->getNamedTag();
             if ($tag->offsetExists("item")) {
-                $nbtitem = Item::nbtDeserialize($tag->getCompoundTag("item"));
+                $itemtag = $tag->getTag("item");
+                //旧バージョンで作成されたラッピングへの対応をするための処理
+                if ($itemtag instanceof CompoundTag) {
+                    //新方式のタグを使用している場合
+                    $nbtitem = Item::nbtDeserialize($itemtag);
+                } else if ($itemtag instanceof StringTag) {
+                    //旧方式(JSON)のタグを使用している場合
+                    $nbtitem = Item::jsonDeserialize(json_decode($itemtag->getValue(), true));
+                }
                 $name = $tag->getString('name');
 
                 $player->getInventory()->removeItem(Item::get($itemid,$itemdamage,1,$tag));
