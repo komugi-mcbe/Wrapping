@@ -14,7 +14,7 @@ use pocketmine\nbt\tag\StringTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\event\Listener;
-use pocketmine\event\Player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 
 Class Main extends PluginBase implements Listener {
