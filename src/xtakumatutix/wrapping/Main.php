@@ -34,8 +34,9 @@ Class Main extends PluginBase implements Listener {
                     $sender->sendMessage("§c >> 2重ラッピングを行うことは出来ません。");
                     return true;
                 }
-                $sender->getInventory()->removeItem($itemhand);
                 $sender->getInventory()->removeItem(Item::get(Item::PAPER));
+                $itemhand = $sender->getInventory()->getItemInHand();//紙の数が減った後、再度手持ちを取得する
+                $sender->getInventory()->removeItem($itemhand);
 
                 $name = $sender->getName();
 
