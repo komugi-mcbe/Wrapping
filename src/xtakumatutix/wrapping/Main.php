@@ -49,7 +49,7 @@ Class Main extends PluginBase implements Listener {
                 $item->setCustomName("{$name}様より");
 
                 $tag = $item->getNamedTag() ?? new CompoundTag('', []);
-                $tag->setTag(new StringTag("item", json_encode($itemhand)), true);
+                $tag->setTag($itemhand->nbtSerialize(-1, "item"), true);
                 $tag->setTag(new StringTag("name","{$name}"), true);
                 $item->setNamedTag($tag);
                 $sender->getInventory()->addItem($item);
@@ -75,7 +75,7 @@ Class Main extends PluginBase implements Listener {
         if ($itemid===378) {
             $tag = $item->getNamedTag();
             if ($tag->offsetExists("item")) {
-                $nbtitem = Item::jsonDeserialize(json_decode($tag->getString('item'), true));
+                $nbtitem = Item::nbtDeserialize($tag->getCompoundTag("item"));
                 $name = $tag->getString('name');
 
                 $player->getInventory()->removeItem(Item::get($itemid,$itemdamage,1,$tag));
