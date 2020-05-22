@@ -7,11 +7,7 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\enchantment\Enchantment;
-use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -38,8 +34,9 @@ Class Main extends PluginBase implements Listener {
                     $sender->sendMessage("§c >> 2重ラッピングを行うことは出来ません。");
                     return true;
                 }
-                $sender->getInventory()->removeItem($itemhand);
                 $sender->getInventory()->removeItem(Item::get(Item::PAPER));
+                $itemhand = $sender->getInventory()->getItemInHand();//紙の数が減った後、再度手持ちを取得する
+                $sender->getInventory()->removeItem($itemhand);
 
                 $name = $sender->getName();
 
@@ -49,7 +46,7 @@ Class Main extends PluginBase implements Listener {
                 $item->setCustomName("{$name}様より");
 
                 $tag = $item->getNamedTag() ?? new CompoundTag('', []);
-                $tag->setTag(new StringTag("item", json_encode($itemhand)), true);
+                $tag->setTag($itemhand->nbtSerialize(-1, "item"), true);
                 $tag->setTag(new StringTag("name","{$name}"), true);
                 $item->setNamedTag($tag);
                 $sender->getInventory()->addItem($item);
@@ -75,7 +72,15 @@ Class Main extends PluginBase implements Listener {
         if ($itemid===378) {
             $tag = $item->getNamedTag();
             if ($tag->offsetExists("item")) {
-                $nbtitem = Item::jsonDeserialize(json_decode($tag->getString('item'), true));
+                $itemtag = $tag->getTag("item");
+                //旧バージョンで作成されたラッピングへの対応をするための処理
+                if ($itemtag instanceof CompoundTag) {
+                    //新方式のタグを使用している場合
+                    $nbtitem = Item::nbtDeserialize($itemtag);
+                } else if ($itemtag instanceof StringTag) {
+                    //旧方式(JSON)のタグを使用している場合
+                    $nbtitem = Item::jsonDeserialize(json_decode($itemtag->getValue(), true));
+                }
                 $name = $tag->getString('name');
 
                 $player->getInventory()->removeItem(Item::get($itemid,$itemdamage,1,$tag));
